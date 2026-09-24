@@ -1,0 +1,6 @@
+# Store text with LF line endings (matches Prettier), regardless of OS settings.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.glb binary
+*.woff2 binary

@@ -1,0 +1,267 @@
+import { defineSimulation, vec3 } from '@/engine'
+import { accelerationOf, createInitialState, step } from './model'
+
+export const PROJECTILE_TIME_STEP = 1 / 240
+
+/** Exported so the aiming interaction uses the same limits as the slider. */
+export const launchAngleVariable = {
+  kind: 'number',
+  id: 'launchAngle',
+  label: 'Launch angle',
+  description: 'How steeply the ball is aimed upward. 0° is flat, 90° is straight up.',
+  unit: 'deg',
+  defaultValue: 45,
+  min: 0,
+  max: 90,
+  step: 1,
+} as const
+
+export const projectileMotion = defineSimulation({
+  id: 'projectile-motion',
+  domain: 'physics',
+  title: 'Projectile Motion',
+  description:
+    'Launch a ball and investigate how speed, angle, height, gravity and air resistance shape its path.',
+  learningObjectives: [
+    'Explain why the horizontal and vertical parts of a projectile’s motion can be analysed independently.',
+    'Predict how launch speed, angle, height and gravity affect range, maximum height and flight time.',
+    'Describe how air resistance changes the trajectory and the launch angle that gives the greatest range.',
+  ],
+  assumptions: [
+    'Uniform gravitational field; flat, level ground at height 0.',
+    'The ball moves as a point mass; its 22 cm diameter is used only for air resistance.',
+    'Without air resistance the motion is computed from the exact closed-form solution.',
+    'With air resistance: quadratic drag on a smooth sphere (C_d = 0.47), still air at sea-level density (1.225 kg/m³), no spin or wind. Integrated numerically (RK4, Δt = 1/240 s); the landing point is interpolated within the final step.',
+    'Earth’s rotation and curvature are ignored.',
+    'The flight ends when the ball first touches the ground (no bounce).',
+    'The ball is drawn larger than its physical size so it stays visible.',
+  ],
+  // Frames the default ≈41 m flight in the gap between the desktop side panels
+  // (≈16 px/m at 1440×900); narrower screens pull back automatically.
+  scene: { worldUnit: 'm', camera: { position: [20, 12, 62], target: [20, 7, 0], fov: 50 } },
+  variables: [
+    {
+      kind: 'number',
+      id: 'launchSpeed',
+      label: 'Launch speed',
+      description: 'How fast the ball leaves the launcher.',
+      unit: 'm/s',
+      defaultValue: 20,
+      min: 1,
+      max: 40,
+      step: 0.5,
+    },
+    launchAngleVariable,
+    {
+      kind: 'number',
+      id: 'launchHeight',
+      label: 'Launch height',
+      description: 'How high above the ground the ball starts, like launching from a cliff.',
+      unit: 'm',
+      defaultValue: 0,
+      min: 0,
+      max: 30,
+      step: 0.5,
+    },
+    {
+      kind: 'number',
+      id: 'gravity',
+      label: 'Gravity',
+      description: 'How strongly the ball is pulled down. Earth ≈ 9.81, Moon ≈ 1.62, Jupiter ≈ 24.8.',
+      unit: 'm/s²',
+      defaultValue: 9.81,
+      min: 1.6,
+      max: 25,
+      step: 0.01,
+    },
+    {
+      kind: 'boolean',
+      id: 'airResistance',
+      label: 'Air resistance',
+      description: 'Turn on to let the air push back against the moving ball.',
+      defaultValue: false,
+    },
+    {
+      kind: 'number',
+      id: 'mass',
+      label: 'Ball mass',
+      description: 'How heavy the ball is. Try it with air resistance off, then on.',
+      unit: 'kg',
+      defaultValue: 0.45,
+      min: 0.05,
+      max: 5,
+      step: 0.05,
+    },
+  ],
+  measurements: [
+    {
+      kind: 'scalar',
+      id: 'horizontalDistance',
+      label: 'Distance travelled',
+      description: 'How far along the ground the ball has gone. When it lands, this is the range.',
+      unit: 'm',
+      emphasis: 'primary',
+    },
+    {
+      kind: 'scalar',
+      id: 'maxHeight',
+      label: 'Highest point',
+      description: 'The greatest height the ball has reached.',
+      unit: 'm',
+      emphasis: 'primary',
+    },
+    {
+      kind: 'scalar',
+      id: 'flightTime',
+      label: 'Time in the air',
+      description: 'Seconds since launch; stops when the ball lands.',
+      unit: 's',
+      emphasis: 'primary',
+    },
+    { kind: 'scalar', id: 'height', label: 'Height now', unit: 'm' },
+    { kind: 'scalar', id: 'speed', label: 'Speed now', unit: 'm/s' },
+    { kind: 'vector', id: 'velocity', label: 'Velocity (x, y, z)', unit: 'm/s', dimensions: 3 },
+    { kind: 'vector', id: 'acceleration', label: 'Acceleration (x, y, z)', unit: 'm/s²', dimensions: 3 },
+    {
+      kind: 'category',
+      id: 'phase',
+      label: 'Status',
+      options: [
+        { value: 'ready', label: 'Ready' },
+        { value: 'in-flight', label: 'In flight' },
+        { value: 'landed', label: 'Landed' },
+      ],
+    },
+  ],
+  objects: [
+    { id: 'launcher', label: 'Launcher', selectable: true },
+    { id: 'projectile', label: 'Ball', selectable: true },
+  ],
+  interactions: [
+    { id: 'aim', kind: 'drag', targetObjectId: 'launcher', variableId: 'launchAngle' },
+    { id: 'select-launcher', kind: 'select', targetObjectId: 'launcher' },
+    { id: 'select-projectile', kind: 'select', targetObjectId: 'projectile' },
+  ],
+  presets: [
+    { id: 'angle-30', title: '30° launch', variables: { launchAngle: 30 } },
+    { id: 'angle-60', title: '60° launch', variables: { launchAngle: 60 } },
+    { id: 'cliff', title: 'Horizontal launch from 20 m', variables: { launchAngle: 0, launchHeight: 20 } },
+    { id: 'moon', title: 'On the Moon', variables: { gravity: 1.62 } },
+    { id: 'air', title: 'With air resistance', variables: { airResistance: true } },
+  ],
+  investigations: [
+    {
+      id: 'best-angle',
+      question: 'Which launch angle sends the ball the farthest?',
+      hint: 'Keep the speed the same. Try 15°, 30°, 45°, 60° and 75°, and record a trial for each.',
+      review: 'draft',
+    },
+    {
+      id: 'complementary',
+      question: 'Do 30° and 60° land in the same place?',
+      hint: 'Run and record this 30° launch. Then set 60°, run it, record it and compare the two trials.',
+      presetId: 'angle-30',
+      review: 'draft',
+    },
+    {
+      id: 'mass',
+      question: 'Does a heavier ball travel farther?',
+      hint: 'Change only the mass and compare trials. Do it once with air resistance off, then with it on.',
+      review: 'draft',
+    },
+    {
+      id: 'moon',
+      question: 'What changes when you throw on the Moon?',
+      hint: 'Record this Moon launch, then set gravity back to 9.81 and compare the time in the air and the distance.',
+      presetId: 'moon',
+      review: 'draft',
+    },
+    {
+      id: 'cliff',
+      question: 'A ball rolls off a cliff. How long does it take to hit the ground?',
+      hint: 'Record this launch. Then change only the launch speed. Does the time in the air change?',
+      presetId: 'cliff',
+      review: 'draft',
+    },
+  ],
+  explanations: [
+    {
+      id: 'independent-motions',
+      anchor: { kind: 'simulation' },
+      title: 'Two independent motions',
+      body: 'Without air resistance, the only force on the ball is gravity, which acts vertically. The horizontal velocity therefore never changes, while the vertical velocity decreases by g every second.\n\nTreating the two directions separately is the key to predicting where the ball lands.',
+      review: 'draft',
+    },
+    {
+      id: 'projectile-forces',
+      anchor: { kind: 'object', id: 'projectile' },
+      title: 'Forces on the ball',
+      body: 'Once launched, nothing pushes the ball forward. Gravity pulls it down with acceleration g. With air resistance on, a drag force also acts opposite to the velocity, growing with the square of the speed.',
+      review: 'draft',
+    },
+    {
+      id: 'launcher-aim',
+      anchor: { kind: 'object', id: 'launcher' },
+      title: 'The launcher',
+      body: 'The launcher sets the initial velocity: its speed and its angle above the horizontal. Drag the launcher to aim it.\n\nThe initial velocity splits into a horizontal part v₀·cos θ and a vertical part v₀·sin θ.',
+      review: 'draft',
+    },
+    {
+      id: 'angle-effect',
+      anchor: { kind: 'variable', id: 'launchAngle' },
+      title: 'Launch angle',
+      body: 'On level ground without air resistance, the range is greatest at 45°, and angles that add up to 90° (such as 30° and 60°) give the same range. Air resistance lowers the best angle.',
+      review: 'draft',
+    },
+    {
+      id: 'mass-effect',
+      anchor: { kind: 'variable', id: 'mass' },
+      title: 'Does mass matter?',
+      body: 'Without air resistance, no: every object falls with the same acceleration g, whatever its mass. With air resistance, a heavier ball of the same size is slowed less, because the same drag force produces a smaller deceleration.',
+      review: 'draft',
+    },
+    {
+      id: 'gravity-effect',
+      anchor: { kind: 'variable', id: 'gravity' },
+      title: 'Gravity',
+      body: 'Weaker gravity means the vertical velocity decreases more slowly, so the ball stays in the air longer and travels further. For a ground-level launch without air resistance, flight time, range and maximum height are all inversely proportional to g.',
+      review: 'draft',
+    },
+    {
+      id: 'max-height',
+      anchor: { kind: 'measurement', id: 'maxHeight' },
+      title: 'Maximum height',
+      body: 'At the highest point the vertical velocity is momentarily zero, but the horizontal velocity is not, so the ball is still moving.',
+      review: 'draft',
+    },
+    {
+      id: 'range',
+      anchor: { kind: 'measurement', id: 'horizontalDistance' },
+      title: 'Range',
+      body: 'When the ball lands, the horizontal distance is the range: the horizontal velocity multiplied by the flight time (without air resistance).',
+      review: 'draft',
+    },
+  ],
+  model: {
+    kind: 'continuous',
+    fixedTimeStep: PROJECTILE_TIME_STEP,
+    // Longest possible ideal flight within the variable limits is ≈ 51 s.
+    maxDuration: 120,
+    createInitialState,
+    step,
+    measure: (state, vars) => {
+      const a = accelerationOf(state, vars)
+      return {
+        flightTime: state.t,
+        horizontalDistance: state.x,
+        maxHeight: state.peak,
+        height: state.y,
+        speed: Math.hypot(state.vx, state.vy),
+        velocity: vec3(state.vx, state.vy, 0),
+        acceleration: vec3(a.x, a.y, 0),
+        phase: state.landed ? 'landed' : state.t > 0 ? 'in-flight' : 'ready',
+      }
+    },
+    isComplete: (state) => state.landed,
+  },
+})
