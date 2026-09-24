@@ -57,3 +57,21 @@ export function formatMeasurement(def: MeasurementDefinition, value: Measurement
       return def.options.find((option) => option.value === value)?.label ?? '—'
   }
 }
+
+/**
+ * Text shown in a number box: the step's precision, or more if the learner
+ * typed a more precise value (so what they entered is never silently hidden).
+ */
+export function formatInputValue(value: number, step: number): string {
+  const decimals = decimalsForStep(step)
+  const fixed = value.toFixed(decimals)
+  return Number(fixed) === value ? fixed : String(Number(value.toPrecision(10)))
+}
+
+/** Parses typed text; accepts a comma as the decimal separator. Returns `null` if it is not a number. */
+export function parseInputValue(text: string): number | null {
+  const normalised = text.trim().replace(',', '.')
+  if (normalised === '') return null
+  const value = Number(normalised)
+  return Number.isFinite(value) ? value : null
+}

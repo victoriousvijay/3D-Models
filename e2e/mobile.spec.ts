@@ -18,7 +18,7 @@ test('phone: open → adjust → run → see results → record, with nothing ov
 
   // Presets are reachable and change the conditions.
   await sheet.getByRole('button', { name: '30° launch' }).click()
-  await expect(sheet.getByRole('region', { name: 'Conditions' })).toContainText('30°')
+  await expect(sheet.getByRole('textbox', { name: 'Launch angle in °' })).toHaveValue('30')
 
   // Start is tappable (not covered by another panel) and the run completes.
   await sheet.getByRole('button', { name: 'Start' }).click()

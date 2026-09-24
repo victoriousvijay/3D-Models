@@ -1,4 +1,4 @@
-﻿import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 /** Collects console errors and uncaught exceptions for the whole test. */
 function trackErrors(page: Page): string[] {
@@ -26,13 +26,13 @@ test('critical journey: open → configure → run → measure → record (TESTI
   const speed = page.getByRole('slider', { name: 'Launch speed' })
   await speed.focus()
   for (let i = 0; i < 10; i++) await speed.press('ArrowRight')
-  await expect(page.getByRole('region', { name: 'Conditions' })).toContainText('25.0 m/s')
+  await expect(page.getByRole('textbox', { name: 'Launch speed in m/s' })).toHaveValue('25.0')
 
   // Change angle: 45° → 30° (step 1)
   const angle = page.getByRole('slider', { name: 'Launch angle' })
   await angle.focus()
   for (let i = 0; i < 15; i++) await angle.press('ArrowLeft')
-  await expect(page.getByRole('region', { name: 'Conditions' })).toContainText('30°')
+  await expect(page.getByRole('textbox', { name: 'Launch angle in °' })).toHaveValue('30')
 
   // Run simulation
   await page.getByRole('button', { name: 'Start' }).click()
@@ -87,4 +87,43 @@ test('explanations follow what the learner asks about', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Explain Ball mass' }).click()
   await expect(page.getByRole('region', { name: 'Ball mass' })).toContainText('Does mass matter?')
+})
+
+test('typing exact values: valid, decimal comma, and out of range', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Projectile Motion' }).click()
+  const conditions = page.getByRole('region', { name: 'Conditions' })
+
+  const speed = conditions.getByRole('textbox', { name: 'Launch speed in m/s' })
+  await speed.fill('25')
+  await speed.press('Enter')
+  await expect(speed).toHaveValue('25.0')
+  await expect(conditions.getByRole('slider', { name: 'Launch speed' })).toHaveAttribute(
+    'aria-valuenow',
+    '25',
+  )
+
+  // A decimal comma is accepted.
+  const angle = conditions.getByRole('textbox', { name: 'Launch angle in °' })
+  await angle.fill('30')
+  await angle.press('Enter')
+  const gravity = conditions.getByRole('textbox', { name: 'Gravity in m/s²' })
+  await gravity.fill('9,81')
+  await gravity.press('Enter')
+  await expect(gravity).toHaveValue('9.81')
+
+  // Out of range: explained next to the field, value unchanged.
+  await speed.fill('99')
+  await speed.press('Enter')
+  await expect(conditions.getByRole('alert')).toContainText('at most 40')
+  await speed.press('Escape')
+  await expect(speed).toHaveValue('25.0')
+
+  // Typed values drive the simulation: R = 25²·sin 60° / 9.81 = 55.17 m.
+  await page.getByRole('button', { name: 'Start' }).click()
+  await expect(page.getByText('Finished!')).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('[data-measurement="horizontalDistance"]')).toHaveText('55.17 m')
+
+  expect(errors).toEqual([])
 })
