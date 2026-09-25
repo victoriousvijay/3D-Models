@@ -85,15 +85,15 @@ ready ──start──▶ running ──pause──▶ paused ──resume─�
          completed / faulted          reset(): any → ready     destroy(): terminal
 ```
 
-| Method                  | Behaviour                                                                          |
-| ----------------------- | ---------------------------------------------------------------------------------- |
-| `constructor`           | initialise: validate variables, build initial state, validate measurements         |
-| `start/pause/resume`    | return `false` for invalid transitions (static models cannot start)                |
-| `update(realDelta)`     | advance by real time: fixed-step accumulator (continuous) or interval (discrete)   |
-| `stepOnce()`            | exactly one step or stage, for frame-by-frame study                                |
-| `setVariables(changes)` | validate, apply, **reset**, so each result maps to one set of initial conditions   |
-| `setTimeScale(s)`       | slow motion / fast-forward (0.05–8×), never changes the model step                 |
-| `getSnapshot()`         | serialisable `{ simulationId, domain, status, progress, variables, measurements }` |
+| Method                  | Behaviour                                                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `constructor`           | initialise: validate variables, build initial state, validate measurements                                      |
+| `start/pause/resume`    | return `false` for invalid transitions (static models cannot start)                                             |
+| `update(realDelta)`     | advance by real time: fixed-step accumulator (continuous) or interval (discrete)                                |
+| `stepOnce()`            | exactly one step or stage, for frame-by-frame study                                                             |
+| `setVariables(changes)` | validate, apply, **reset**, so each result maps to one set of initial conditions (except live variables, below) |
+| `setTimeScale(s)`       | slow motion / fast-forward (0.05–8×), never changes the model step                                              |
+| `getSnapshot()`         | serialisable `{ simulationId, domain, status, progress, variables, measurements }`                              |
 
 Numerical guarantees:
 
@@ -103,6 +103,15 @@ Numerical guarantees:
   on a frame boundary is never skipped (regression tested).
 - **Fault containment.** Exceptions in model code fault the run and emit `fault` instead of
   crashing the app.
+
+**Live variables.** A definition can list `liveVariables`. These are conditions that do not
+change the initial conditions of a run, such as a double-slit wavelength or a detector position.
+If every changed variable is live, the runtime keeps its state and status, recomputes the
+measurements and then emits `variables`. It does not reset. The learner can adjust these while
+the lab runs or after it completes, and see the result straight away. Setting an unchanged value
+is a no-op for such labs. Labs without `liveVariables` behave exactly as before.
+`isLiveVariable(id)` lets the UI keep only those controls unlocked while running. Unknown ids
+are rejected by `validateSimulationDefinition`.
 
 Events (`runtime.events`): `status`, `variables`, `reset`, `fault`, and `stepped`, which is
 emitted only by a manual `stepOnce()`. There is deliberately no per-frame event. Consumers read state inside the render loop, or poll snapshots at their own rate.

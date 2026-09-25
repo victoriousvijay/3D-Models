@@ -27,7 +27,7 @@ Every lab is its own world. Opening a lab never shows a generic 3D viewer: it en
 | Lab                       | Environment                                                    | Key objects                                                  |
 | ------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------ |
 | Projectile Motion ✅      | Testing range: open light, metre grid, axes (`LabEnvironment`) | Launcher, ball, trajectory, range marker, vectors            |
-| Double Slit               | Optics darkroom: dark walls, single light source, no grid      | Laser source, slit plate, screen, wavefronts, fringes        |
+| Double Slit (YDSE) ✅     | Optics darkroom (`OpticsDarkroom`): navy room, bench, no grid  | Laser source, slit plate, screen, wavefronts, fringes        |
 | Electric Flux — Cube      | Electrostatics bench: neutral void, subtle depth cues          | Point charge, Gaussian cube, field lines, face flux readouts |
 | EM Wave                   | Field space: axis rails for E and B, propagation direction     | E and B vectors along the wave, wavefront planes             |
 | Rolling Race              | Mechanics bench: incline ramp, finish line, timing gates       | Ring, disc, sphere, block                                    |
@@ -37,6 +37,8 @@ Every lab is its own world. Opening a lab never shows a generic 3D viewer: it en
 Rules:
 
 - Pick `scene.worldUnit` to match the world (m, Å, AU, 1). Never assume metres.
+- Dark environments set `sceneTone: 'dark'` in the package. The header text turns light, and the
+  floating panels become near-opaque so they stay legible over the scene.
 - The environment must not compete with the science: low contrast, few draw calls, no unrelated decoration.
 - If two labs genuinely share a world, such as two mechanics-bench labs, share the environment component through the domain's `visual/` folder. Don't copy it.
 

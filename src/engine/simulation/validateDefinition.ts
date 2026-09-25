@@ -109,6 +109,10 @@ export function validateSimulationDefinition(
   issues.push(...validateExplanations(def))
   issues.push(...validateInvestigations(def))
 
+  for (const id of def.liveVariables ?? []) {
+    if (!variableIds.has(id)) issues.push(`liveVariables names unknown variable "${id}".`)
+  }
+
   if (availableUnits) {
     const used: [string, UnitId][] = [['scene.worldUnit', def.scene.worldUnit]]
     for (const v of def.variables) if (v.kind === 'number') used.push([`variable "${v.id}"`, v.unit])

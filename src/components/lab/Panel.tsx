@@ -23,7 +23,8 @@ export function Panel({
     <section
       className={cn(
         'pointer-events-auto text-sm',
-        !bare && 'rounded-lg border border-lab-line/70 bg-lab-bg/80 p-3 shadow-lg backdrop-blur-sm',
+        !bare &&
+          'rounded-lg border border-lab-line/70 bg-lab-bg/80 p-3 shadow-lg backdrop-blur-sm group-data-[tone=dark]/tone:bg-lab-bg/95',
         className,
       )}
       {...(title ? { 'aria-label': title } : {})}

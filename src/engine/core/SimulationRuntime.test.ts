@@ -251,3 +251,69 @@ describe('SimulationRuntime — faults', () => {
     expect(snapshot.domain).toBe('fixture')
   })
 })
+
+describe('SimulationRuntime — live variables', () => {
+  const liveDecay = { ...decayFixture, liveVariables: ['rate'] } as const
+
+  it('updates a live variable in place: no reset, progress kept, re-measured', () => {
+    const runtime = new SimulationRuntime(liveDecay)
+    runtime.start()
+    play(runtime, 0.5, 1 / 60)
+    const before = seconds(runtime)
+    const resets = vi.fn()
+    runtime.events.on('reset', resets)
+
+    expect(runtime.setVariables({ rate: 2 }).ok).toBe(true)
+
+    expect(runtime.status).toBe('running')
+    expect(seconds(runtime)).toBe(before)
+    expect(runtime.measurements.halfLife).toBeCloseTo(Math.LN2 / 2, 12)
+    expect(resets).not.toHaveBeenCalled()
+    expect(runtime.isLiveVariable('rate')).toBe(true)
+    expect(runtime.isLiveVariable('initialAmount')).toBe(false)
+  })
+
+  it('still resets when any non-live variable changes', () => {
+    const runtime = new SimulationRuntime(liveDecay)
+    runtime.start()
+    play(runtime, 0.5, 1 / 60)
+    runtime.setVariables({ rate: 2, initialAmount: 10 })
+    expect(runtime.status).toBe('ready')
+    expect(seconds(runtime)).toBe(0)
+  })
+
+  it('keeps a completed run completed when a live variable changes', () => {
+    const runtime = new SimulationRuntime(liveDecay, { initialVariables: { initialAmount: 2, rate: 10 } })
+    runtime.start()
+    play(runtime, 1, 1 / 60)
+    expect(runtime.status).toBe('completed')
+    runtime.setVariables({ rate: 5 })
+    expect(runtime.status).toBe('completed')
+    expect(runtime.measurements.halfLife).toBeCloseTo(Math.LN2 / 5, 12)
+  })
+
+  it('rejects invalid live values without changing anything', () => {
+    const runtime = new SimulationRuntime(liveDecay)
+    runtime.start()
+    expect(runtime.setVariables({ rate: 999 }).ok).toBe(false)
+    expect(runtime.variables.rate).toBe(0.5)
+    expect(runtime.status).toBe('running')
+  })
+
+  it('treats setting an unchanged value as a no-op', () => {
+    const runtime = new SimulationRuntime(liveDecay)
+    runtime.start()
+    play(runtime, 0.5, 1 / 60)
+    runtime.setVariables({ rate: 0.5, initialAmount: 1000 })
+    expect(runtime.status).toBe('running')
+    expect(seconds(runtime)).toBeGreaterThan(0)
+  })
+
+  it('without liveVariables every change resets (existing behaviour)', () => {
+    const runtime = new SimulationRuntime(decayFixture)
+    runtime.start()
+    play(runtime, 0.5, 1 / 60)
+    runtime.setVariables({ rate: 2 })
+    expect(runtime.status).toBe('ready')
+  })
+})

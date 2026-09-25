@@ -5,6 +5,7 @@ export { SimulationDriver } from './SimulationDriver'
 export { SimulationRuntimeContext, useSimulationRuntime } from './runtimeContext'
 export { sceneColors } from './theme'
 export { useRuntimeStatus } from './useRuntimeStatus'
+export { useRuntimeVariables } from './useRuntimeVariables'
 
 export { useSelectable } from './interaction/useSelectable'
 export { usePlaneDrag } from './interaction/usePlaneDrag'

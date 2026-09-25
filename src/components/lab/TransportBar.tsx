@@ -64,7 +64,8 @@ export function TransportBar({
       aria-label="Simulation controls"
       className={cn(
         'pointer-events-auto flex items-center gap-2',
-        !compact && 'rounded-lg border border-lab-line/70 bg-lab-bg/80 p-1.5 shadow-lg backdrop-blur-sm',
+        !compact &&
+          'rounded-lg border border-lab-line/70 bg-lab-bg/80 p-1.5 shadow-lg backdrop-blur-sm group-data-[tone=dark]/tone:bg-lab-bg/95',
       )}
     >
       <Button onClick={primary.action} className={compact ? 'h-10 flex-1 text-base' : 'min-w-28'}>

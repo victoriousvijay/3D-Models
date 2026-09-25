@@ -22,10 +22,13 @@ export function SimulationDriver({ runtime }: { runtime: AnySimulationRuntime })
     }
     const offReset = runtime.events.on('reset', redraw)
     const offStepped = runtime.events.on('stepped', redraw)
+    // Live variables can change while paused or finished; the scene must redraw.
+    const offVariables = runtime.events.on('variables', redraw)
     return () => {
       offStatus()
       offReset()
       offStepped()
+      offVariables()
     }
   }, [runtime, invalidate])
 

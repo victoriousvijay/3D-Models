@@ -9,7 +9,10 @@ import {
   type LabEntry,
 } from '.'
 
-const registered = [{ id: 'projectile-motion', domain: 'physics' }]
+const registered = [
+  { id: 'projectile-motion', domain: 'physics' },
+  { id: 'double-slit', domain: 'physics' },
+]
 
 describe('LAB_CATALOGUE', () => {
   it('lists the full catalogue: 16 physics, 30 chemistry, 12 botany, 15 zoology', () => {

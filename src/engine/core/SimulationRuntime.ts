@@ -220,10 +220,30 @@ export class SimulationRuntime<D extends AnySimulationDefinition> {
     if (!resolution.ok) return resolution
 
     const values = resolution.values as VarsOf<D>
+    const previous = this.#vars
+    const changed = Object.keys(changes).filter((id) => previous[id] !== (values as VariableValues)[id])
+    const live = new Set<string>(this.definition.liveVariables ?? [])
+    // Labs with live variables treat an unchanged value as a no-op rather than a restart.
+    if (changed.length === 0 && live.size > 0) return { ok: true, values: this.#variables }
     this.#variables = values
+
+    if (changed.length > 0 && changed.every((id) => live.has(id))) {
+      // Steady conditions changed: keep the run and its progress, re-measure in place,
+      // then notify, so listeners never read measurements from the old values.
+      this.#safely(() => {
+        this.#measurements = this.#measure()
+      })
+      this.events.emit('variables', { values })
+      return { ok: true, values }
+    }
     this.events.emit('variables', { values })
     this.reset()
     return { ok: true, values }
+  }
+
+  /** True when `id` names a live variable (adjustable while running; see `liveVariables`). */
+  isLiveVariable(id: string): boolean {
+    return this.definition.liveVariables?.includes(id) ?? false
   }
 
   /** Returns to the initial state with the current variables. */

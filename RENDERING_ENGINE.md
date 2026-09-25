@@ -29,6 +29,7 @@ Three.js · React Three Fiber (v9) · Drei. Postprocessing only when a simulatio
 | `usePlaneDrag({ onDrag, enabled })`                             | Generic drag on a plane: pointer capture, suspends orbit controls, reports plane hits. The simulation maps hits to a variable (Phase 1: launcher → angle)          |
 | `VectorArrow`                                                   | Draws any vector measurement with a declared scale, updated in the render loop (no React renders)                                                                  |
 | `Trail`                                                         | Path trace in a preallocated buffer; clears on reset                                                                                                               |
+| `useRuntimeVariables(runtime)`                                  | Subscribes to variable values (`variables`/`reset` events), for views that redraw from live variables                                                              |
 | `useOverlayVisible(id)`                                         | Learner-controlled overlay visibility; simulations declare overlays (label, colour, scale note) in their package for the legend                                    |
 
 **Responsive framing.** `FitToAspect`, inside `LabCanvas`, keeps the authored camera framing
@@ -38,6 +39,14 @@ On canvases narrower than 640 px, the orientation gizmo shrinks and hides its ne
 
 Phase 1 scene cost (Projectile Motion): about 20 draw calls and a few thousand triangles, all
 primitive geometry. It sits well inside the budgets below.
+
+Double Slit (YDSE) scene cost: about 23 draw calls per frame. The interference map and the
+screen are single shader planes that share one GLSL intensity function, with a phase box filter
+to avoid moiré. Measured at 60 fps on desktop. The view only renders continuously while the
+wavefronts are animating; reduced motion stops it.
+
+`SimulationDriver` also invalidates on `variables`, so live-variable changes redraw a demand
+frameloop.
 
 The canvas remounts per simulation (`key` = simulation id). This re-creates the camera and
 projection and releases GPU memory from the previous simulation.

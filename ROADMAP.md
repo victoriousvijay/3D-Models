@@ -53,6 +53,20 @@ Follow-up (same day): **responsive and student-friendly UI**.
 Carried forward: GLB assets; expert review of explanations and investigations; camera "follow/frame trajectory" for
 long flights (e.g. Moon preset); a drag-to-aim e2e test (verified manually with a real mouse).
 
+## Lab 2 — Double Slit (YDSE) ✅ (2026-09-25)
+
+- [x] Spec first: `docs/labs/DOUBLE_SLIT_YDSE_SPEC.md`
+- [x] Optics service `src/domains/physics/optics/interference.ts` (40 tests)
+- [x] Optics darkroom environment, laser, S₁/S₂ barrier, screen, draggable detector, ruler, orders, β marker
+- [x] Shader interference map and screen from one formula; conceptual wavefronts; I(y) graph
+- [x] Live parameters without restart. Smallest platform change: `liveVariables` in the engine
+- [x] Measurements, 7 presets, 6 investigations, 13 explanations (draft, awaiting expert review)
+- [x] Desktop and phone e2e; Projectile Motion suites unchanged and passing
+- [x] Platform additions: `sceneTone` for dark scenes, `useRuntimeVariables`, `nm`/`mm` units
+
+Carried forward: expert review of the learning content; a single-slit diffraction envelope as an
+optional overlay (the spec assumes narrow slits).
+
 ## Phase 2 — Physics Library
 
 Pendulum, Newton's Laws, Optics, Gravity. Introduce Rapier through `physicsDomain.initialize()`

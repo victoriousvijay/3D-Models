@@ -184,7 +184,11 @@ export function VariablePanel({ runtime, bare = false }: { runtime: AnySimulatio
   const { variables, status } = useRuntimeSnapshot(runtime)
   const [presetIssue, setPresetIssue] = useState<string | null>(null)
   const { definition } = runtime
-  const locked = status === 'running'
+  const running = status === 'running'
+  // Live variables (steady conditions) stay adjustable while the lab runs; others lock.
+  const lockedFor = (id: string) => running && !runtime.isLiveVariable(id)
+  const everythingLive = definition.variables.every((v) => runtime.isLiveVariable(v.id))
+  const locked = running && !everythingLive
   const explained = new Set(
     definition.explanations.flatMap((e) => (e.anchor.kind === 'variable' ? [e.anchor.id] : [])),
   )
@@ -224,7 +228,7 @@ export function VariablePanel({ runtime, bare = false }: { runtime: AnySimulatio
             key={def.id}
             def={def}
             value={variables[def.id]}
-            disabled={locked}
+            disabled={lockedFor(def.id)}
             explained={explained.has(def.id)}
             apply={(value) => firstIssue(runtime.setVariables({ [def.id]: value }))}
           />

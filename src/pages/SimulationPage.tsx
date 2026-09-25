@@ -65,7 +65,7 @@ function SimulationExperience({
           </LabCanvas>
         </div>
         <SimulationWorkspace pkg={pkg} runtime={runtime} experiments={platform.experiments} />
-        <SimulationHeader title={lab.title} division={division} />
+        <SimulationHeader title={lab.title} division={division} tone={pkg.sceneTone} />
       </main>
     </SimulationRuntimeContext>
   )

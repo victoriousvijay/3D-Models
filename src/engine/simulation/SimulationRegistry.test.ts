@@ -74,3 +74,10 @@ describe('validateSimulationDefinition', () => {
     expect(issues).toMatch(/fixedTimeStep/)
   })
 })
+
+describe('validateSimulationDefinition — liveVariables', () => {
+  it('rejects unknown live variable ids', () => {
+    const broken: AnySimulationDefinition = { ...decayFixture, liveVariables: ['rate', 'ghost'] }
+    expect(validateSimulationDefinition(broken).join('\n')).toMatch(/unknown variable "ghost"/)
+  })
+})

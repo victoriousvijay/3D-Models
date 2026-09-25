@@ -49,6 +49,14 @@ Implemented in `e2e/projectile-motion.spec.ts`:
 - **Explanations** follow the learner's focus.
 - **No console errors**, checked in every test.
 
+`e2e/double-slit.spec.ts` and `e2e/double-slit-mobile.spec.ts` cover the second lab:
+
+- **Desktop journey:** open the lab from the Physics Lab and switch the light on. The red laser
+  gives β = 1.95 mm, with a bright central maximum. Typing 532 nm updates β live to 1.60 mm
+  without a restart. A detector at 0.80 mm reads "Dark fringe". Two trials are recorded and
+  compared (Δβ = −0.35 mm). No console errors.
+- **Phone:** the pattern forms, and changing d live halves β. The canvas keeps a usable height.
+
 `e2e/shell.spec.ts` covers the application shell.
 
 Playwright runs against the production build (`npm run e2e`). Headless Chromium supplies real
@@ -65,6 +73,8 @@ For known scenarios, compare results against expected analytical solutions withi
 | `src/domains/physics/dynamics/drag.test.ts`           | k → 0 limit equals the ideal range; monotonic effects              | 1e-4 m        |
 | `src/lib/numerics/rk4.test.ts`                        | exp(−t), cos t, measured 4th-order convergence                     | 1e-9 – 1e-10  |
 | `src/simulations/physics/projectile-motion/*.test.ts` | runtime results vs closed forms; frame-rate independence with drag | 1e-9 / 1e-3 m |
+| `src/domains/physics/optics/interference.test.ts`     | β = λD/d, I at nβ and (n+½)β, exact vs small-angle Δ               | 1e-12 / 1e-3  |
+| `src/simulations/physics/double-slit/*.test.ts`       | runtime readings vs closed forms; live variables; extremes         | 1e-10 – 1e-12 |
 
 ## Regression
 

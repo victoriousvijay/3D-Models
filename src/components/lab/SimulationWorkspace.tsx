@@ -21,7 +21,8 @@ interface WorkspaceProps {
 /** Wide screens: instrument panels float over the full-screen 3D lab. */
 function FloatingWorkspace({ pkg, runtime, experiments }: WorkspaceProps) {
   return (
-    <div className="pointer-events-none absolute inset-0">
+    // data-tone: panels turn near-opaque over dark scenes so they stay legible.
+    <div className="group/tone pointer-events-none absolute inset-0" data-tone={pkg.sceneTone}>
       <div className="absolute top-24 bottom-40 left-4 flex w-80 flex-col">
         <ExplanationPanel runtime={runtime} />
       </div>

@@ -26,20 +26,27 @@ export interface SimulationPackage {
   readonly definition: AnySimulationDefinition
   readonly View: LazyExoticComponent<ComponentType>
   readonly Environment: ComponentType
+  /** Whether the environment is light or dark, so shared chrome over the scene stays legible. */
+  readonly sceneTone: SceneTone
   readonly overlays: readonly OverlayDescriptor[]
 }
+
+export type SceneTone = 'light' | 'dark'
 
 export function defineSimulationPackage(options: {
   definition: AnySimulationDefinition
   loadView: () => Promise<{ default: ComponentType }>
   /** Scene surroundings: lighting, ground, backdrop, reference aids. Rendered inside the canvas. */
   Environment: ComponentType
+  /** Default `'light'`. Use `'dark'` for darkrooms, space, cell interiors… */
+  sceneTone?: SceneTone
   overlays?: readonly OverlayDescriptor[]
 }): SimulationPackage {
   return {
     definition: options.definition,
     View: lazy(options.loadView),
     Environment: options.Environment,
+    sceneTone: options.sceneTone ?? 'light',
     overlays: options.overlays ?? [],
   }
 }

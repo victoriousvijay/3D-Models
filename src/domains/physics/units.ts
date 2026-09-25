@@ -7,6 +7,8 @@ declare module '@/engine/types/units' {
     'kg·m/s': true
     'N·m': true
     deg: true
+    nm: true
+    mm: true
   }
 }
 
@@ -18,4 +20,7 @@ export const PHYSICS_UNITS: readonly UnitDefinition[] = [
   { id: 'N·m', name: 'newton metre', quantity: 'torque' },
   // Degrees are a learner-facing input unit; models convert to radians before calculating.
   { id: 'deg', name: 'degree', quantity: 'plane angle', toSI: { factor: Math.PI / 180 } },
+  // Conventional optics units; models convert to metres before calculating.
+  { id: 'nm', name: 'nanometre', quantity: 'length', toSI: { factor: 1e-9 } },
+  { id: 'mm', name: 'millimetre', quantity: 'length', toSI: { factor: 1e-3 } },
 ]

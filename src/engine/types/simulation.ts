@@ -90,6 +90,14 @@ export interface SimulationDefinition<
   readonly objects: readonly SimulationObjectDefinition[]
   readonly interactions: readonly InteractionDefinition[]
   readonly presets: readonly ExperimentPreset<ValuesOf<TVarDefs>>[]
+  /**
+   * Variables that describe steady conditions rather than initial conditions
+   * (a screen's distance, a wavelength, a detector's position). Changing only
+   * these updates the run in place — new values, re-measured — instead of
+   * resetting it, and they stay adjustable while it runs. Omit for labs where
+   * every result must come from one set of initial conditions.
+   */
+  readonly liveVariables?: readonly TVarDefs[number]['id'][]
   /** Contextual teaching content anchored to this simulation's objects, variables and measurements. */
   readonly explanations: readonly Explanation[]
   /** Questions that guide learners into experimenting ("Try this"). */

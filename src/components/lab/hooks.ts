@@ -28,6 +28,7 @@ export function useRuntimeSnapshot(runtime: AnySimulationRuntime): Snapshot {
       runtime.events.on('status', refresh),
       runtime.events.on('reset', refresh),
       runtime.events.on('stepped', refresh),
+      runtime.events.on('variables', refresh),
     ]
     const timer = setInterval(refresh, 1000 / READOUT_HZ)
     return () => {

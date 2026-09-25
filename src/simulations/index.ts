@@ -1,3 +1,4 @@
+import { doubleSlitPackage } from './physics/double-slit'
 import { projectileMotionPackage } from './physics/projectile-motion'
 import type { SimulationPackage } from './types'
 
@@ -10,7 +11,7 @@ import type { SimulationPackage } from './types'
  *   index.ts       — `defineSimulationPackage({ definition, loadView: () => import('./View') })`
  * then add the package to this list. No engine changes are required.
  */
-export const simulationPackages: readonly SimulationPackage[] = [projectileMotionPackage]
+export const simulationPackages: readonly SimulationPackage[] = [projectileMotionPackage, doubleSlitPackage]
 
 export { defineSimulationPackage } from './types'
-export type { OverlayDescriptor, SimulationPackage } from './types'
+export type { OverlayDescriptor, SceneTone, SimulationPackage } from './types'

@@ -1,24 +1,2 @@
-import { useCallback, useSyncExternalStore } from 'react'
-
-/** Tracks a CSS media query. */
-export function useMediaQuery(query: string): boolean {
-  const subscribe = useCallback(
-    (notify: () => void) => {
-      const list = window.matchMedia(query)
-      list.addEventListener('change', notify)
-      return () => {
-        list.removeEventListener('change', notify)
-      }
-    },
-    [query],
-  )
-  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches)
-}
-
-/** Wide screens get floating instrument panels; narrower ones get a bottom sheet. */
-export const WIDE_LAYOUT_QUERY = '(min-width: 1024px)'
-
-/** True when the learner has asked the OS to minimise motion. Animations must then be skipped. */
-export function usePrefersReducedMotion(): boolean {
-  return useMediaQuery('(prefers-reduced-motion: reduce)')
-}
+/** Re-exported for existing UI imports; the hooks live in `@/lib/useMediaQuery` so any layer can use them. */
+export { useMediaQuery, usePrefersReducedMotion, WIDE_LAYOUT_QUERY } from '@/lib/useMediaQuery'
