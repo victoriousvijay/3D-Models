@@ -67,6 +67,18 @@ long flights (e.g. Moon preset); a drag-to-aim e2e test (verified manually with 
 Carried forward: expert review of the learning content; a single-slit diffraction envelope as an
 optional overlay (the spec assumes narrow slits).
 
+## Lab 4 — Rolling Race ✅ (2026-09-25)
+
+- [x] Spec first: `docs/labs/ROLLING_RACE_SPEC.md`
+- [x] Mechanics service `src/domains/physics/mechanics/rolling.ts` (30 tests)
+- [x] Rolling workshop environment; three-lane ramp that pivots with θ, start gate, photogate finish, foam catcher, angle arc, distance markers
+- [x] Solid sphere, solid cylinder, hollow sphere and ring, with markings that show rolling (φ = s/r)
+- [x] Per-lane shape, mass and radius; race times, winner, v, a, ω, KE_trans, KE_rot, PE and I per lane
+- [x] Drag the start gate to set L; overlays for velocity, progress and markers (on), plus centre of mass, acceleration, ω and energy columns (off by default)
+- [x] 7 presets, 6 investigations, 14 explanations (draft, awaiting expert review)
+- [x] Platform: `OverlayDescriptor.defaultVisible` (backwards compatible, store-tested); `rad/s` and `kg·m²` units
+- [x] Desktop and phone e2e; all earlier labs' suites unchanged and passing
+
 ## Lab 3 — 1D Collision ✅ (2026-09-25)
 
 - [x] Spec first: `docs/labs/ONE_D_COLLISION_SPEC.md`

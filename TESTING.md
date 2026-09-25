@@ -68,6 +68,16 @@ Implemented in `e2e/projectile-motion.spec.ts`:
 - Dragging a velocity arrow was verified with a real mouse: dragging B's arrow tip 0.5 m to the
   left set −1.00 m/s.
 
+`e2e/rolling-race.spec.ts` and `e2e/rolling-race-mobile.spec.ts` cover the fourth lab:
+
+- **Shapes vs sizes:** sphere, cylinder and ring at 10° over 2 m take 1.81, 1.88 and 2.17 s, and lane 1
+  wins. Three spheres of 30, 60 and 100 mm tie at 1.81 s. Comparing the trials shows the changed bodies
+  and a lane 3 difference of −0.35 s.
+- **Angle:** at 30° the times are 1.07 s and 1.28 s and the order is unchanged. The energy columns
+  toggle on without errors.
+- **Phone:** heavy and light rings tie at 2.17 s; then record.
+- Dragging the start gate was verified with a real mouse (L 2.00 → 1.25 m).
+
 `e2e/shell.spec.ts` covers the application shell.
 
 Playwright runs against the production build (`npm run e2e`). Headless Chromium supplies real
@@ -78,16 +88,18 @@ animation frames. Note that an embedded or hidden browser pane may not run
 
 For known scenarios, compare results against expected analytical solutions within a documented tolerance.
 
-| Suite                                                 | Reference                                                            | Tolerance     |
-| ----------------------------------------------------- | -------------------------------------------------------------------- | ------------- |
-| `src/domains/physics/kinematics/projectile.test.ts`   | closed-form range, flight time, peak, energy                         | 1e-9 – 1e-10  |
-| `src/domains/physics/dynamics/drag.test.ts`           | k → 0 limit equals the ideal range; monotonic effects                | 1e-4 m        |
-| `src/lib/numerics/rk4.test.ts`                        | exp(−t), cos t, measured 4th-order convergence                       | 1e-9 – 1e-10  |
-| `src/simulations/physics/projectile-motion/*.test.ts` | runtime results vs closed forms; frame-rate independence with drag   | 1e-9 / 1e-3 m |
-| `src/domains/physics/optics/interference.test.ts`     | β = λD/d, I at nβ and (n+½)β, exact vs small-angle Δ                 | 1e-12 / 1e-3  |
-| `src/simulations/physics/double-slit/*.test.ts`       | runtime readings vs closed forms; live variables; extremes           | 1e-10 – 1e-12 |
-| `src/domains/physics/mechanics/collision1d.test.ts`   | conservation laws, textbook cases, closed-form contact end state     | 1e-12 – 1e-15 |
-| `src/simulations/physics/collision-1d/*.test.ts`      | momentum at every sample incl. contact; outcomes; no-collision cases | 1e-12         |
+| Suite                                                 | Reference                                                               | Tolerance     |
+| ----------------------------------------------------- | ----------------------------------------------------------------------- | ------------- |
+| `src/domains/physics/kinematics/projectile.test.ts`   | closed-form range, flight time, peak, energy                            | 1e-9 – 1e-10  |
+| `src/domains/physics/dynamics/drag.test.ts`           | k → 0 limit equals the ideal range; monotonic effects                   | 1e-4 m        |
+| `src/lib/numerics/rk4.test.ts`                        | exp(−t), cos t, measured 4th-order convergence                          | 1e-9 – 1e-10  |
+| `src/simulations/physics/projectile-motion/*.test.ts` | runtime results vs closed forms; frame-rate independence with drag      | 1e-9 / 1e-3 m |
+| `src/domains/physics/optics/interference.test.ts`     | β = λD/d, I at nβ and (n+½)β, exact vs small-angle Δ                    | 1e-12 / 1e-3  |
+| `src/simulations/physics/double-slit/*.test.ts`       | runtime readings vs closed forms; live variables; extremes              | 1e-10 – 1e-12 |
+| `src/domains/physics/mechanics/collision1d.test.ts`   | conservation laws, textbook cases, closed-form contact end state        | 1e-12 – 1e-15 |
+| `src/simulations/physics/collision-1d/*.test.ts`      | momentum at every sample incl. contact; outcomes; no-collision cases    | 1e-12         |
+| `src/domains/physics/mechanics/rolling.test.ts`       | I per shape, a = g sin θ/(1+k), energy, v = ωr, μ_min                   | 1e-12 – 1e-15 |
+| `src/simulations/physics/rolling-race/*.test.ts`      | race times, ties, order at all angles, energy at every sample, extremes | 1e-12         |
 
 ## Regression
 

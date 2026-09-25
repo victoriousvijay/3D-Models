@@ -34,7 +34,10 @@ function SimulationExperience({
   const { Environment } = pkg
 
   useEffect(() => {
-    openSimulation(pkg.definition.id)
+    openSimulation(
+      pkg.definition.id,
+      pkg.overlays.filter((overlay) => overlay.defaultVisible === false).map((overlay) => overlay.id),
+    )
     return closeSimulation
   }, [pkg, openSimulation, closeSimulation])
 

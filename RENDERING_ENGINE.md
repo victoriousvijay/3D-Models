@@ -16,21 +16,21 @@ Three.js · React Three Fiber (v9) · Drei. Postprocessing only when a simulatio
 
 ## Built
 
-| Piece                                                           | Purpose                                                                                                                                                            |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `LabCanvas`                                                     | The single WebGL surface. `frameloop="demand"`, adaptive DPR (drops to 1 on low FPS), perspective or orthographic camera from `SceneConfig.camera`, orbit controls |
-| `LabEnvironment`                                                | Subject-neutral surroundings: lighting, double-sided reference grid (1 cell = 1 `worldUnit`), orientation gizmo                                                    |
-| `SimulationDriver`                                              | Bridges `useFrame` → `runtime.update(delta)`; requests frames only while running or after a change; skips the stale first delta after idle                         |
-| `SimulationRuntimeContext` / `useSimulationRuntime(definition)` | Gives a view its runtime, typed via a real identity check, not a cast                                                                                              |
-| `SimulationErrorBoundary` (app)                                 | A failing view or lazy load cannot take down the canvas or WebGL context                                                                                           |
-| `sceneColors`                                                   | Scene palette, mirrored by the Tailwind `lab-*` tokens                                                                                                             |
-| `useRuntimeStatus(runtime)`                                     | Subscribes a component to lifecycle status (human-speed re-renders only)                                                                                           |
-| `useSelectable(objectId)`                                       | Click-to-select, hover cursor and highlight state for a declared object; selection focuses its explanation                                                         |
-| `usePlaneDrag({ onDrag, enabled })`                             | Generic drag on a plane: pointer capture, suspends orbit controls, reports plane hits. The simulation maps hits to a variable (Phase 1: launcher → angle)          |
-| `VectorArrow`                                                   | Draws any vector measurement with a declared scale, updated in the render loop (no React renders)                                                                  |
-| `Trail`                                                         | Path trace in a preallocated buffer; clears on reset                                                                                                               |
-| `useRuntimeVariables(runtime)`                                  | Subscribes to variable values (`variables`/`reset` events), for views that redraw from live variables                                                              |
-| `useOverlayVisible(id)`                                         | Learner-controlled overlay visibility; simulations declare overlays (label, colour, scale note) in their package for the legend                                    |
+| Piece                                                           | Purpose                                                                                                                                                                                    |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `LabCanvas`                                                     | The single WebGL surface. `frameloop="demand"`, adaptive DPR (drops to 1 on low FPS), perspective or orthographic camera from `SceneConfig.camera`, orbit controls                         |
+| `LabEnvironment`                                                | Subject-neutral surroundings: lighting, double-sided reference grid (1 cell = 1 `worldUnit`), orientation gizmo                                                                            |
+| `SimulationDriver`                                              | Bridges `useFrame` → `runtime.update(delta)`; requests frames only while running or after a change; skips the stale first delta after idle                                                 |
+| `SimulationRuntimeContext` / `useSimulationRuntime(definition)` | Gives a view its runtime, typed via a real identity check, not a cast                                                                                                                      |
+| `SimulationErrorBoundary` (app)                                 | A failing view or lazy load cannot take down the canvas or WebGL context                                                                                                                   |
+| `sceneColors`                                                   | Scene palette, mirrored by the Tailwind `lab-*` tokens                                                                                                                                     |
+| `useRuntimeStatus(runtime)`                                     | Subscribes a component to lifecycle status (human-speed re-renders only)                                                                                                                   |
+| `useSelectable(objectId)`                                       | Click-to-select, hover cursor and highlight state for a declared object; selection focuses its explanation                                                                                 |
+| `usePlaneDrag({ onDrag, enabled })`                             | Generic drag on a plane: pointer capture, suspends orbit controls, reports plane hits. The simulation maps hits to a variable (Phase 1: launcher → angle)                                  |
+| `VectorArrow`                                                   | Draws any vector measurement with a declared scale, updated in the render loop (no React renders)                                                                                          |
+| `Trail`                                                         | Path trace in a preallocated buffer; clears on reset                                                                                                                                       |
+| `useRuntimeVariables(runtime)`                                  | Subscribes to variable values (`variables`/`reset` events), for views that redraw from live variables                                                                                      |
+| `useOverlayVisible(id)`                                         | Learner-controlled overlay visibility; simulations declare overlays (label, colour, scale note) in their package for the legend. `defaultVisible: false` starts an advanced overlay hidden |
 
 **Responsive framing.** `FitToAspect`, inside `LabCanvas`, keeps the authored camera framing
 visible when the 3D area is narrower than 1.6:1, as on phones or with the mobile bottom sheet
@@ -48,6 +48,10 @@ wavefronts are animating; reduced motion stops it.
 1D Collision scene cost: about 45 draw calls while running, at 60 fps. The track's 194 air
 holes are one `instancedMesh`, and board bars and glider labels update through refs, never
 through React state.
+
+Rolling Race scene cost: 59 draw calls per frame with every overlay on, at 60 fps. The ramp
+is one tilted group, so bodies roll in its local frame. The checkered finish is a single
+4×4 `DataTexture`.
 
 `SimulationDriver` also invalidates on `variables`, so live-variable changes redraw a demand
 frameloop.

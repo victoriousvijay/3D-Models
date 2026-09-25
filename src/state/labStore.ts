@@ -21,7 +21,8 @@ interface LabState {
    */
   explanationFocus: ExplanationAnchor | null
 
-  openSimulation: (id: string) => void
+  /** `hiddenOverlays`: overlays that start switched off for this simulation. */
+  openSimulation: (id: string, hiddenOverlays?: readonly string[]) => void
   closeSimulation: () => void
   setStatus: (status: SimulationStatus | null) => void
   selectObject: (id: string | null) => void
@@ -37,8 +38,8 @@ export const useLabStore = create<LabState>()((set) => ({
   status: null,
   ...cleared,
 
-  openSimulation: (id) => {
-    set({ activeSimulationId: id, ...cleared })
+  openSimulation: (id, hiddenOverlays = []) => {
+    set({ activeSimulationId: id, ...cleared, hiddenOverlays })
   },
   closeSimulation: () => {
     set({ activeSimulationId: null, status: null, ...cleared })

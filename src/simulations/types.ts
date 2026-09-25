@@ -8,6 +8,8 @@ export interface OverlayDescriptor {
   readonly color: string
   /** How the overlay maps to physical quantities, e.g. "1 m of arrow = 5 m/s". */
   readonly note?: string
+  /** Default `true`. Advanced overlays can start hidden so the default view stays uncluttered. */
+  readonly defaultVisible?: boolean
 }
 
 /**

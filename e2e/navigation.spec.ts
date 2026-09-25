@@ -56,8 +56,8 @@ test('reduced motion: no transitions, navigation is immediate', async ({ page })
 test('planned labs, unknown labs and unknown addresses are handled', async ({ page }) => {
   const errors = trackErrors(page)
 
-  await page.goto('/lab/physics/rolling-race')
-  await expect(page.getByRole('heading', { name: 'Rolling Race' })).toBeVisible()
+  await page.goto('/lab/physics/total-internal-reflection')
+  await expect(page.getByRole('heading', { name: 'Total Internal Reflection' })).toBeVisible()
   await expect(page.getByText('This lab is being built.')).toBeVisible()
   await page.getByRole('link', { name: 'Projectile Motion' }).click()
   await expect(page).toHaveURL(/\/lab\/physics\/projectile-motion$/)

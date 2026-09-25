@@ -1,6 +1,7 @@
 import { collision1dPackage } from './physics/collision-1d'
 import { doubleSlitPackage } from './physics/double-slit'
 import { projectileMotionPackage } from './physics/projectile-motion'
+import { rollingRacePackage } from './physics/rolling-race'
 import type { SimulationPackage } from './types'
 
 /**
@@ -16,6 +17,7 @@ export const simulationPackages: readonly SimulationPackage[] = [
   projectileMotionPackage,
   doubleSlitPackage,
   collision1dPackage,
+  rollingRacePackage,
 ]
 
 export { defineSimulationPackage } from './types'
