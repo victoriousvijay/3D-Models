@@ -1,12 +1,77 @@
 import { cn } from 'cn'
-import { Pause, Play, RotateCcw, StepForward } from 'lucide-react'
+import { Focus, Hand, PanelsTopLeft, PenLine, Pause, Play, RotateCcw, StepForward } from 'lucide-react'
 import { useState } from 'react'
 import type { AnySimulationRuntime, RunProgress } from '@/engine'
 import { Button } from '@/components/ui/button'
+import { useAnnotationStore } from '@/state/annotationStore'
+import { useLabStore } from '@/state/labStore'
 import { formatNumber } from './format'
 import { useRuntimeSnapshot } from './hooks'
 
 const TIME_SCALES = [0.25, 0.5, 1, 2] as const
+
+const toggledClass = 'aria-pressed:bg-lab-accent/15 aria-pressed:text-lab-accent'
+
+/**
+ * View tools shared by every lab: grab mode (drag moves the view, wheel zooms
+ * to the cursor), reset view and — on wide screens — hide all panels.
+ */
+function ViewTools({ compact }: { compact: boolean }) {
+  const grabMode = useLabStore((state) => state.grabMode)
+  const panelsHidden = useLabStore((state) => state.panelsHidden)
+  const toggleGrabMode = useLabStore((state) => state.toggleGrabMode)
+  const togglePanels = useLabStore((state) => state.togglePanels)
+  const resetView = useLabStore((state) => state.resetView)
+  const annotating = useAnnotationStore((state) => state.active)
+  const toggleAnnotating = useAnnotationStore((state) => state.toggle)
+  const size = compact ? 'icon-lg' : 'icon'
+  return (
+    <div role="group" aria-label="View" className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size={size}
+        aria-label="Annotate"
+        aria-pressed={annotating}
+        title={annotating ? 'Close annotation tools' : 'Annotate: draw on the lab'}
+        className={toggledClass}
+        onClick={toggleAnnotating}
+      >
+        <PenLine aria-hidden />
+      </Button>
+      <Button
+        variant="ghost"
+        size={size}
+        aria-label="Grab mode"
+        aria-pressed={grabMode}
+        title={
+          grabMode
+            ? 'Grab mode on: drag to move the view, scroll to zoom'
+            : 'Grab mode: drag to move the view'
+        }
+        className={toggledClass}
+        onClick={toggleGrabMode}
+      >
+        <Hand aria-hidden />
+      </Button>
+      <Button variant="ghost" size={size} aria-label="Reset view" title="Reset view" onClick={resetView}>
+        <Focus aria-hidden />
+      </Button>
+      {compact ? null : (
+        <Button
+          variant="ghost"
+          size={size}
+          aria-label={panelsHidden ? 'Show panels' : 'Hide panels'}
+          aria-pressed={panelsHidden}
+          title={panelsHidden ? 'Show panels' : 'Hide panels'}
+          className={toggledClass}
+          onClick={togglePanels}
+        >
+          <PanelsTopLeft aria-hidden />
+        </Button>
+      )}
+    </div>
+  )
+}
 
 function progressText(progress: RunProgress): string {
   switch (progress.kind) {
@@ -33,7 +98,20 @@ export function TransportBar({
 }) {
   const { status, progress } = useRuntimeSnapshot(runtime)
   const [timeScale, setTimeScale] = useState(runtime.timeScale)
-  if (!runtime.isDynamic) return null
+  const chrome =
+    'pointer-events-auto flex items-center gap-2 rounded-lg border border-lab-line/70 bg-lab-bg/80 p-1.5 shadow-lg backdrop-blur-sm group-data-[tone=dark]/tone:bg-lab-bg/95'
+  // Static labs (nothing to run) still get the view tools.
+  if (!runtime.isDynamic) {
+    return (
+      <div
+        role="toolbar"
+        aria-label="Simulation controls"
+        className={cn(chrome, compact && 'border-0 bg-transparent p-0 shadow-none')}
+      >
+        <ViewTools compact={compact} />
+      </div>
+    )
+  }
 
   const primary =
     status === 'running'
@@ -126,6 +204,8 @@ export function TransportBar({
           {progressText(progress)}
         </span>
       )}
+      <span aria-hidden className={cn('h-6 w-px bg-lab-line', compact && 'hidden')} />
+      <ViewTools compact={compact} />
       {status === 'faulted' ? (
         <span role="alert" className="px-2 text-xs text-red-600">
           The model produced an invalid result. Reset to continue.

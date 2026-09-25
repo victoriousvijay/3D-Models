@@ -5,6 +5,8 @@ import { LabCanvas, SimulationRuntimeContext } from '@/rendering'
 import { findDivision, findLab, type LabDivision, type LabEntry } from '@/catalogue'
 import { SimulationHeader } from '@/components/SimulationHeader'
 import { SimulationWorkspace } from '@/components/lab/SimulationWorkspace'
+import { AnnotationBar } from '@/components/lab/annotation/AnnotationBar'
+import { AnnotationLayer } from '@/components/lab/annotation/AnnotationLayer'
 import type { SimulationPackage } from '@/simulations'
 import { useLabStore } from '@/state/labStore'
 import { platform } from '@/app/platform'
@@ -57,7 +59,8 @@ function SimulationExperience({
       {/* Column layout: the 3D lab fills the space above the mobile bottom sheet; on wide screens
           the sheet is absent and floating panels overlay the lab instead. */}
       <main className="relative flex h-dvh w-full flex-col overflow-hidden bg-lab-bg text-lab-strong">
-        <div className="relative min-h-0 flex-1">
+        {/* isolate: labels drawn by the 3D scene (drei Html) stay beneath the floating panels. */}
+        <div className="relative isolate min-h-0 flex-1">
           <LabCanvas camera={pkg.definition.scene.camera}>
             <Environment />
             <SimulationErrorBoundary onError={setLoadError}>
@@ -66,6 +69,8 @@ function SimulationExperience({
               </Suspense>
             </SimulationErrorBoundary>
           </LabCanvas>
+          <AnnotationLayer />
+          <AnnotationBar />
         </div>
         <SimulationWorkspace pkg={pkg} runtime={runtime} experiments={platform.experiments} />
         <SimulationHeader title={lab.title} division={division} tone={pkg.sceneTone} />

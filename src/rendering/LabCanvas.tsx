@@ -1,7 +1,8 @@
 import { OrbitControls, PerformanceMonitor } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useState, type ReactNode } from 'react'
-import { OrthographicCamera } from 'three'
+import { MOUSE, OrthographicCamera, TOUCH } from 'three'
+import { useLabStore } from '@/state/labStore'
 import type { SceneConfig } from '@/engine'
 import { sceneColors } from './theme'
 
@@ -21,6 +22,64 @@ interface Updatable {
 const isUpdatable = (value: unknown): value is Updatable =>
   typeof value === 'object' && value !== null && 'update' in value && typeof value.update === 'function'
 
+/** The parts of drei's OrbitControls this file configures. */
+interface NavigableControls extends Updatable {
+  target: { set: (x: number, y: number, z: number) => void }
+  mouseButtons: { LEFT?: MOUSE | null; MIDDLE?: MOUSE | null; RIGHT?: MOUSE | null }
+  touches: { ONE?: TOUCH | null; TWO?: TOUCH | null }
+  zoomToCursor: boolean
+}
+const isNavigable = (value: unknown): value is NavigableControls =>
+  isUpdatable(value) && 'mouseButtons' in value && 'touches' in value && 'target' in value
+
+const ORBIT_MOUSE = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }
+const GRAB_MOUSE = { LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }
+const ORBIT_TOUCH = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
+const GRAB_TOUCH = { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_PAN }
+
+/**
+ * Grab mode (toolbar hand button): left drag / one finger pans, the wheel zooms
+ * towards the cursor, right drag still rotates, and scene objects ignore the
+ * pointer so a drag never selects or moves them by accident.
+ */
+function NavigationMode() {
+  const grab = useLabStore((state) => state.grabMode)
+  const get = useThree((state) => state.get)
+  // Re-run once drei registers the default controls (after the first render).
+  const hasControls = useThree((state) => state.controls !== null)
+
+  useEffect(() => {
+    const { controls, setEvents, gl } = get()
+    const canvas = gl.domElement
+    if (isNavigable(controls)) {
+      controls.mouseButtons = grab ? GRAB_MOUSE : ORBIT_MOUSE
+      controls.touches = grab ? GRAB_TOUCH : ORBIT_TOUCH
+      controls.zoomToCursor = grab
+    }
+    setEvents({ enabled: !grab })
+    if (!grab) {
+      canvas.style.cursor = ''
+      return
+    }
+    canvas.style.cursor = 'grab'
+    const down = () => {
+      canvas.style.cursor = 'grabbing'
+    }
+    const up = () => {
+      canvas.style.cursor = 'grab'
+    }
+    canvas.addEventListener('pointerdown', down)
+    window.addEventListener('pointerup', up)
+    return () => {
+      canvas.removeEventListener('pointerdown', down)
+      window.removeEventListener('pointerup', up)
+      canvas.style.cursor = ''
+    }
+  }, [grab, get, hasControls])
+
+  return null
+}
+
 /**
  * Keeps the authored framing visible on narrow or portrait viewports (phones,
  * split screens) by moving the camera back along its view direction — or
@@ -30,6 +89,8 @@ function FitToAspect({ camera: config }: { camera: SceneConfig['camera'] }) {
   const width = useThree((state) => state.size.width)
   const height = useThree((state) => state.size.height)
   const get = useThree((state) => state.get)
+  // "Reset view" re-applies the authored framing, including the orbit target a pan moved.
+  const resetToken = useLabStore((state) => state.viewResetToken)
   const [px, py, pz] = config.position
   const [tx, ty, tz] = config.target
 
@@ -44,9 +105,10 @@ function FitToAspect({ camera: config }: { camera: SceneConfig['camera'] }) {
       camera.position.set(tx + (px - tx) * factor, ty + (py - ty) * factor, tz + (pz - tz) * factor)
       camera.lookAt(tx, ty, tz)
     }
+    if (isNavigable(controls)) controls.target.set(tx, ty, tz)
     if (isUpdatable(controls)) controls.update()
     invalidate()
-  }, [width, height, get, px, py, pz, tx, ty, tz])
+  }, [width, height, get, px, py, pz, tx, ty, tz, resetToken])
 
   return null
 }
@@ -94,6 +156,7 @@ export function LabCanvas({ camera = DEFAULT_CAMERA, children }: LabCanvasProps)
       />
       <OrbitControls makeDefault target={[tx, ty, tz]} enableDamping />
       <FitToAspect camera={camera} />
+      <NavigationMode />
       {children}
     </Canvas>
   )

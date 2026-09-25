@@ -20,6 +20,12 @@ interface LabState {
    * info buttons focus a variable or measurement; `null` shows the overview.
    */
   explanationFocus: ExplanationAnchor | null
+  /** Grab mode: a left drag moves (pans) the view instead of rotating it; objects ignore clicks. */
+  grabMode: boolean
+  /** All floating panels hidden, leaving the scene and the toolbar. */
+  panelsHidden: boolean
+  /** Incremented to ask the canvas to return to the simulation's authored camera framing. */
+  viewResetToken: number
 
   /** `hiddenOverlays`: overlays that start switched off for this simulation. */
   openSimulation: (id: string, hiddenOverlays?: readonly string[]) => void
@@ -29,13 +35,24 @@ interface LabState {
   setLoadError: (message: string | null) => void
   toggleOverlay: (id: string) => void
   focusExplanation: (anchor: ExplanationAnchor | null) => void
+  toggleGrabMode: () => void
+  togglePanels: () => void
+  resetView: () => void
 }
 
-const cleared = { selectedObjectId: null, loadError: null, hiddenOverlays: [], explanationFocus: null }
+const cleared = {
+  selectedObjectId: null,
+  loadError: null,
+  hiddenOverlays: [],
+  explanationFocus: null,
+  grabMode: false,
+  panelsHidden: false,
+}
 
 export const useLabStore = create<LabState>()((set) => ({
   activeSimulationId: null,
   status: null,
+  viewResetToken: 0,
   ...cleared,
 
   openSimulation: (id, hiddenOverlays = []) => {
@@ -55,6 +72,15 @@ export const useLabStore = create<LabState>()((set) => ({
   },
   setLoadError: (message) => {
     set({ loadError: message })
+  },
+  toggleGrabMode: () => {
+    set(({ grabMode }) => ({ grabMode: !grabMode }))
+  },
+  togglePanels: () => {
+    set(({ panelsHidden }) => ({ panelsHidden: !panelsHidden }))
+  },
+  resetView: () => {
+    set(({ viewResetToken }) => ({ viewResetToken: viewResetToken + 1 }))
   },
   toggleOverlay: (id) => {
     set(({ hiddenOverlays }) => ({

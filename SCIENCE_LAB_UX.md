@@ -44,6 +44,24 @@ The product should feel like entering a scientific facility. It should not feel 
 - Available labs open their own world (MODEL_ECOSYSTEM_GUIDELINES.md) with the shared instrument layer (GOLD_STANDARD_LAB.md).
 - Planned labs show a "coming soon" page with the concept, chapter, planned simulation type, and links to the labs that are ready.
 
+## Lab tools (every lab)
+
+These tools live in the toolbar next to the run controls, so every lab gets them without any simulation code.
+
+- **Collapsible panels.** Each floating panel has a chevron that collapses it to its title. The **hide panels** button (desktop) removes them all and leaves the scene and the toolbar.
+- **Grab mode** (hand). A left drag or one finger moves the view instead of rotating it, the wheel zooms towards the cursor, and a right drag still rotates. Scene objects ignore the pointer, so a drag never selects or moves anything by accident. **Reset view** returns to the lab's framing.
+- **Annotate** (pen). This opens the annotation bar:
+  - pen, highlighter, line, arrow, rectangle and circle
+  - an eraser that removes whole strokes
+  - eight colours plus a colour picker, and three thicknesses
+  - undo (Ctrl/⌘+Z), clear all and close (Esc)
+
+  While the bar is open, the pointer draws and the scene does not move. Drawings stay visible after closing and are cleared when you leave the lab. They are screen overlays: they do not follow the camera, so use them on a still view.
+
+- Labels drawn in the 3D scene sit beneath the panels (the canvas is its own stacking context).
+
+The logic is framework-free geometry in `src/lib/annotation.ts` (paths, arrowheads, eraser hit-testing) and store state in `src/state/annotationStore.ts` and `src/state/labStore.ts`, all unit-tested. `e2e/view-tools.spec.ts` covers them in the browser.
+
 ## Later (not built yet)
 
 Search and filter across labs; chapter/class filters; progress indicators per lab; recently opened labs.

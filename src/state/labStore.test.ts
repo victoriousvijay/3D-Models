@@ -25,3 +25,28 @@ describe('lab store overlays', () => {
     expect(useLabStore.getState().hiddenOverlays).toEqual([])
   })
 })
+
+describe('lab store view tools', () => {
+  beforeEach(() => {
+    useLabStore.getState().closeSimulation()
+  })
+
+  it('grab mode and hidden panels toggle, and reset when another simulation opens', () => {
+    const store = useLabStore.getState()
+    store.openSimulation('a')
+    expect(useLabStore.getState().grabMode).toBe(false)
+    store.toggleGrabMode()
+    store.togglePanels()
+    expect(useLabStore.getState().grabMode).toBe(true)
+    expect(useLabStore.getState().panelsHidden).toBe(true)
+    store.openSimulation('b')
+    expect(useLabStore.getState().grabMode).toBe(false)
+    expect(useLabStore.getState().panelsHidden).toBe(false)
+  })
+
+  it('reset view bumps a token the canvas listens to', () => {
+    const before = useLabStore.getState().viewResetToken
+    useLabStore.getState().resetView()
+    expect(useLabStore.getState().viewResetToken).toBe(before + 1)
+  })
+})

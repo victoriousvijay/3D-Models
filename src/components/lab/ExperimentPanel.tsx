@@ -97,6 +97,7 @@ export function ExperimentPanel({
     <Panel
       title={`My trials (${records.length})`}
       bare={bare}
+      collapsible={false}
       className={bare ? undefined : 'w-80'}
       actions={
         bare ? null : (

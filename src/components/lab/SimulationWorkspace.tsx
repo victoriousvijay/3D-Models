@@ -2,6 +2,7 @@ import { cn } from 'cn'
 import { useState } from 'react'
 import type { AnySimulationRuntime, ExperimentLog } from '@/engine'
 import type { SimulationPackage } from '@/simulations'
+import { useLabStore } from '@/state/labStore'
 import { ExperimentPanel } from './ExperimentPanel'
 import { ExplanationPanel } from './ExplanationPanel'
 import { useExperimentRecords } from './hooks'
@@ -20,6 +21,16 @@ interface WorkspaceProps {
 
 /** Wide screens: instrument panels float over the full-screen 3D lab. */
 function FloatingWorkspace({ pkg, runtime, experiments }: WorkspaceProps) {
+  const panelsHidden = useLabStore((state) => state.panelsHidden)
+  if (panelsHidden) {
+    return (
+      <div className="group/tone pointer-events-none absolute inset-0" data-tone={pkg.sceneTone}>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+          <TransportBar runtime={runtime} />
+        </div>
+      </div>
+    )
+  }
   return (
     // data-tone: panels turn near-opaque over dark scenes so they stay legible.
     <div className="group/tone pointer-events-none absolute inset-0" data-tone={pkg.sceneTone}>
