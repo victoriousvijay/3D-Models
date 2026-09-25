@@ -84,6 +84,27 @@ export default tseslint.config(
     },
   },
   {
+    // The lab catalogue is plain data plus pure helpers: no frameworks, no UI.
+    files: ['src/catalogue/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: frameworkImports,
+          patterns: [
+            ...frameworkPatterns,
+            { group: outerLayers, message: 'The catalogue must not depend on outer layers.' },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Route tables legitimately mix lazy page components and router config.
+    files: ['src/app/router.tsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
     // shadcn/ui components co-export their variant helpers by convention.
     files: ['src/components/ui/**/*.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },

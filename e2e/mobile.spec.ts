@@ -9,8 +9,7 @@ test('phone: open → adjust → run → see results → record, with nothing ov
   })
   page.on('pageerror', (error) => errors.push(error.message))
 
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Projectile Motion' }).click()
+  await page.goto('/lab/physics/projectile-motion')
 
   const sheet = page.getByRole('region', { name: 'Lab controls' })
   await expect(sheet).toBeVisible()

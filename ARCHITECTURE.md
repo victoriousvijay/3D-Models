@@ -7,6 +7,26 @@ scientific simulation, but nothing about any particular science. Physics is the 
 module**, not the foundation: Chemistry, Biology, Astronomy, Earth Science and Mathematics plug in
 through the same contracts, and no domain may impose its assumptions on another.
 
+## Product Layer: the Scientific Universe
+
+```text
+Platform
+├── Landing Experience                 /                     LandingPage (hero 3D, portal transition)
+├── Science Lab Hub                    /lab                  LabHubPage (3D facility, 4 division stations)
+├── Division Labs                      /lab/:division        DivisionPage (labs by chapter)
+│   ├── Physics   (16)  → physics domain engine
+│   ├── Chemistry (30)  → chemistry domain engine
+│   ├── Botany    (12)  → biology domain engine
+│   └── Zoology   (15)  → biology domain engine
+└── Labs                               /lab/:division/:lab   SimulationPage → the lab's own world
+```
+
+The **catalogue** (`src/catalogue`, LAB_CATALOGUE.md) describes what exists: divisions and labs,
+with their status. The **simulation packages** (`src/simulations`) are what runs. Validation at
+startup keeps the two consistent. Each package brings its own **Environment** (MODEL_ECOSYSTEM_GUIDELINES.md),
+so labs share one interaction language but not one world. See LAB_NAVIGATION_ARCHITECTURE.md,
+SCIENCE_LAB_UX.md, GOLD_STANDARD_LAB.md and LAB_IMPLEMENTATION_FRAMEWORK.md.
+
 ## High-Level Architecture
 
 ```text
@@ -40,8 +60,9 @@ Arrows point to what a layer may import. Rules marked 🔒 are enforced by ESLin
 (`no-restricted-imports` in `eslint.config.js`).
 
 ```text
-app ─────────▶ components, state, rendering, simulations, domains, engine
-components ──▶ state, simulations (types), engine        (generic panels driven by definitions)
+app, pages ──▶ components, catalogue, state, rendering, simulations, domains, engine
+components ──▶ catalogue, state, simulations (types), engine   (panels, hub, landing)
+catalogue ───▶ engine (types)                            🔒 no React/Three/outer layers
 simulations ─▶ rendering, domains, lib/numerics, engine
 rendering ───▶ state, engine                             🔒 never a domain, simulation or UI
 domains ─────▶ lib/numerics, engine, declared dependency domains   🔒 no React/Three/outer layers
@@ -105,12 +126,17 @@ an architecture review.
 
 ```text
 src/
-  app/                 composition root (platform.ts), App shell, SimulationHost, error boundary
+  app/                 composition root (platform.ts), router, SimulationHost, error boundary
+  pages/               Landing, LabHub, Division, Simulation (+ LabComingSoon), NotFound
+  catalogue/           divisions + 73 lab entries, validation (framework-free)
   components/
+    landing/           HeroScene (3D constellation), EnterLabButton
+    hub/               HubScene (3D facility), DivisionEmblem, EmblemCanvas
+    catalogue/         LabRow, LabGlyph (concept previews)
     lab/               generic instrument panels: variables, transport, measurements,
-                       experiments, explanations, overlay legend; formatting
+                       experiments, explanations, overlay legend; formatting; media queries
     ui/                shadcn/ui primitives (Base UI), adapted in place
-    SimulationCatalog  domain/simulation navigation
+    SimulationHeader   back-to-division link and lab title over a simulation
   engine/              Simulation SDK — framework-free, subject-agnostic
     core/              SimulationRuntime (lifecycle, progression, faults)
     domains/           DomainRegistry, defineDomain
@@ -136,7 +162,7 @@ src/
     physics/
       projectile-motion/  definition, model, aiming, View, overlays, tests
     index.ts           installed simulation packages
-    types.ts           SimulationPackage (definition + lazy view + overlay descriptors)
+    types.ts           SimulationPackage (definition + lazy view + Environment + overlays)
   state/               Zustand store (open simulation, status, selection, overlays, explanation focus)
 e2e/                   Playwright tests
 ```
@@ -147,7 +173,10 @@ astronomy,earth-science,mathematics}`, `src/ai`, `src/persistence`, further
 
 ## Related Specifications
 
-SIMULATION_ENGINE.md · RENDERING_ENGINE.md · INTERACTION_ENGINE.md · EXPERIMENT_ENGINE.md ·
+Product: SCIENCE_LAB_UX.md · LAB_NAVIGATION_ARCHITECTURE.md · LAB_CATALOGUE.md ·
+GOLD_STANDARD_LAB.md · LAB_IMPLEMENTATION_FRAMEWORK.md · MODEL_ECOSYSTEM_GUIDELINES.md
+
+Engine: SIMULATION_ENGINE.md · RENDERING_ENGINE.md · INTERACTION_ENGINE.md · EXPERIMENT_ENGINE.md ·
 MEASUREMENT_ENGINE.md · EDUCATION_ENGINE.md · ASSET_PIPELINE.md · AI_TUTOR.md · DATABASE.md ·
 SECURITY.md · PERFORMANCE.md · TESTING.md
 

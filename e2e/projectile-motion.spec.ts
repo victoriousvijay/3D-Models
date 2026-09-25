@@ -10,16 +10,16 @@ function trackErrors(page: Page): string[] {
   return errors
 }
 
+const PROJECTILE_URL = '/lab/physics/projectile-motion'
+
 const measurement = (page: Page, id: string) => page.locator(`[data-measurement="${id}"]`)
 
 test('critical journey: open → configure → run → measure → record (TESTING.md)', async ({ page }) => {
   const errors = trackErrors(page)
-  await page.goto('/')
-
   // Open platform → select Physics → select Projectile Motion
-  const catalog = page.getByRole('navigation', { name: 'Simulations' })
-  await expect(catalog).toContainText('Physics')
-  await catalog.getByRole('button', { name: 'Projectile Motion' }).click()
+  await page.goto('/lab/physics')
+  await page.getByRole('link', { name: 'Projectile Motion' }).click()
+  await expect(page).toHaveURL(/\/lab\/physics\/projectile-motion$/)
   await expect(measurement(page, 'phase')).toHaveText('Ready')
 
   // Change velocity: 20 → 25 m/s (step 0.5)
@@ -55,8 +55,7 @@ test('critical journey: open → configure → run → measure → record (TESTI
 
 test('comparing complementary angles shows equal range', async ({ page }) => {
   const errors = trackErrors(page)
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Projectile Motion' }).click()
+  await page.goto(PROJECTILE_URL)
 
   for (const preset of ['30° launch', '60° launch']) {
     await page.getByRole('button', { name: preset }).click()
@@ -79,8 +78,7 @@ test('comparing complementary angles shows equal range', async ({ page }) => {
 })
 
 test('explanations follow what the learner asks about', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Projectile Motion' }).click()
+  await page.goto(PROJECTILE_URL)
   await expect(page.getByRole('region', { name: 'About this experiment' })).toContainText(
     'Two independent motions',
   )
@@ -91,8 +89,7 @@ test('explanations follow what the learner asks about', async ({ page }) => {
 
 test('typing exact values: valid, decimal comma, and out of range', async ({ page }) => {
   const errors = trackErrors(page)
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Projectile Motion' }).click()
+  await page.goto(PROJECTILE_URL)
   const conditions = page.getByRole('region', { name: 'Conditions' })
 
   const speed = conditions.getByRole('textbox', { name: 'Launch speed in m/s' })

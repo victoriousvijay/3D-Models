@@ -17,3 +17,8 @@ export function useMediaQuery(query: string): boolean {
 
 /** Wide screens get floating instrument panels; narrower ones get a bottom sheet. */
 export const WIDE_LAYOUT_QUERY = '(min-width: 1024px)'
+
+/** True when the learner has asked the OS to minimise motion. Animations must then be skipped. */
+export function usePrefersReducedMotion(): boolean {
+  return useMediaQuery('(prefers-reduced-motion: reduce)')
+}
