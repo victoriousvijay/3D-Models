@@ -30,7 +30,7 @@ interface LabEntry {
 
 Source: the NEET lab directory (72 labs), plus Projectile Motion (Physics, _Motion in a Plane_), for 73 in total. Physics entries have descriptions. The other divisions gain them as each lab is designed.
 
-Available: **Projectile Motion** and **Double Slit (YDSE)** (Physics).
+Available: **Projectile Motion**, **Double Slit (YDSE)** and **1D Collision** (Physics).
 
 For planned labs, `experience` is the intended model kind and may change during design.
 

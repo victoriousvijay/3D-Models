@@ -67,6 +67,18 @@ long flights (e.g. Moon preset); a drag-to-aim e2e test (verified manually with 
 Carried forward: expert review of the learning content; a single-slit diffraction envelope as an
 optional overlay (the spec assumes narrow slits).
 
+## Lab 3 — 1D Collision ✅ (2026-09-25)
+
+- [x] Spec first: `docs/labs/ONE_D_COLLISION_SPEC.md`
+- [x] Mechanics service `src/domains/physics/mechanics/collision1d.ts` (52 tests)
+- [x] Air-track bench environment; air track with instanced air holes, ruler, end stops, +x axis
+- [x] Gliders with type-specific bumpers (spring, rubber, putty) that compress to scale during contact
+- [x] Closed-form model: approach → spring–damper contact → separation; momentum exact at every instant
+- [x] Drag the velocity arrows to set initial velocities; velocity and momentum arrows; live p/K board with start ticks; collision marker
+- [x] 16 measurements, 7 presets, 6 investigations, 11 explanations (draft, awaiting expert review)
+- [x] Desktop and phone e2e; Projectile Motion and Double Slit suites unchanged and passing
+- [x] No platform changes needed
+
 ## Phase 2 — Physics Library
 
 Pendulum, Newton's Laws, Optics, Gravity. Introduce Rapier through `physicsDomain.initialize()`

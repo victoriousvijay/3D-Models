@@ -29,6 +29,7 @@ Every lab is its own world. Opening a lab never shows a generic 3D viewer: it en
 | Projectile Motion ✅      | Testing range: open light, metre grid, axes (`LabEnvironment`) | Launcher, ball, trajectory, range marker, vectors            |
 | Double Slit (YDSE) ✅     | Optics darkroom (`OpticsDarkroom`): navy room, bench, no grid  | Laser source, slit plate, screen, wavefronts, fringes        |
 | Electric Flux — Cube      | Electrostatics bench: neutral void, subtle depth cues          | Point charge, Gaussian cube, field lines, face flux readouts |
+| 1D Collision ✅           | Air-track bench (`AirTrackBench`): bright lab, bench, no grid  | Air track, two gliders with bumpers, ruler, p/K board        |
 | EM Wave                   | Field space: axis rails for E and B, propagation direction     | E and B vectors along the wave, wavefront planes             |
 | Rolling Race              | Mechanics bench: incline ramp, finish line, timing gates       | Ring, disc, sphere, block                                    |
 | Cell/organ labs (Zoology) | Tissue/cell interior, soft volumetric light                    | Organelles with parent–child hierarchy, isolate mode         |

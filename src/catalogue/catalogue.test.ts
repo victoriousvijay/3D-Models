@@ -12,6 +12,7 @@ import {
 const registered = [
   { id: 'projectile-motion', domain: 'physics' },
   { id: 'double-slit', domain: 'physics' },
+  { id: 'collision-1d', domain: 'physics' },
 ]
 
 describe('LAB_CATALOGUE', () => {

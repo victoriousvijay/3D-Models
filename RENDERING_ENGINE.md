@@ -45,6 +45,10 @@ screen are single shader planes that share one GLSL intensity function, with a p
 to avoid moiré. Measured at 60 fps on desktop. The view only renders continuously while the
 wavefronts are animating; reduced motion stops it.
 
+1D Collision scene cost: about 45 draw calls while running, at 60 fps. The track's 194 air
+holes are one `instancedMesh`, and board bars and glider labels update through refs, never
+through React state.
+
 `SimulationDriver` also invalidates on `variables`, so live-variable changes redraw a demand
 frameloop.
 

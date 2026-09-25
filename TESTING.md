@@ -57,6 +57,17 @@ Implemented in `e2e/projectile-motion.spec.ts`:
   compared (Δβ = −0.35 mm). No console errors.
 - **Phone:** the pattern forms, and changing d live halves β. The canvas keeps a usable height.
 
+`e2e/collision-1d.spec.ts` and `e2e/collision-1d-mobile.spec.ts` cover the third lab:
+
+- **Elastic vs sticky:** open the lab from the Physics Lab. Equal masses, elastic: A stops and
+  B leaves at 1.00 m/s. Sticky: both move at 0.50 m/s. Comparing the trials shows the same
+  total momentum and −0.13 J of kinetic energy.
+- **Typed values:** a heavy target sends A back at −0.60 m/s. A typed head-on (B at −1 m/s)
+  gives a total momentum of 0 and swapped velocities.
+- **Phone:** light target (0.60 and 1.60 m/s), then record in the Trials tab.
+- Dragging a velocity arrow was verified with a real mouse: dragging B's arrow tip 0.5 m to the
+  left set −1.00 m/s.
+
 `e2e/shell.spec.ts` covers the application shell.
 
 Playwright runs against the production build (`npm run e2e`). Headless Chromium supplies real
@@ -67,14 +78,16 @@ animation frames. Note that an embedded or hidden browser pane may not run
 
 For known scenarios, compare results against expected analytical solutions within a documented tolerance.
 
-| Suite                                                 | Reference                                                          | Tolerance     |
-| ----------------------------------------------------- | ------------------------------------------------------------------ | ------------- |
-| `src/domains/physics/kinematics/projectile.test.ts`   | closed-form range, flight time, peak, energy                       | 1e-9 – 1e-10  |
-| `src/domains/physics/dynamics/drag.test.ts`           | k → 0 limit equals the ideal range; monotonic effects              | 1e-4 m        |
-| `src/lib/numerics/rk4.test.ts`                        | exp(−t), cos t, measured 4th-order convergence                     | 1e-9 – 1e-10  |
-| `src/simulations/physics/projectile-motion/*.test.ts` | runtime results vs closed forms; frame-rate independence with drag | 1e-9 / 1e-3 m |
-| `src/domains/physics/optics/interference.test.ts`     | β = λD/d, I at nβ and (n+½)β, exact vs small-angle Δ               | 1e-12 / 1e-3  |
-| `src/simulations/physics/double-slit/*.test.ts`       | runtime readings vs closed forms; live variables; extremes         | 1e-10 – 1e-12 |
+| Suite                                                 | Reference                                                            | Tolerance     |
+| ----------------------------------------------------- | -------------------------------------------------------------------- | ------------- |
+| `src/domains/physics/kinematics/projectile.test.ts`   | closed-form range, flight time, peak, energy                         | 1e-9 – 1e-10  |
+| `src/domains/physics/dynamics/drag.test.ts`           | k → 0 limit equals the ideal range; monotonic effects                | 1e-4 m        |
+| `src/lib/numerics/rk4.test.ts`                        | exp(−t), cos t, measured 4th-order convergence                       | 1e-9 – 1e-10  |
+| `src/simulations/physics/projectile-motion/*.test.ts` | runtime results vs closed forms; frame-rate independence with drag   | 1e-9 / 1e-3 m |
+| `src/domains/physics/optics/interference.test.ts`     | β = λD/d, I at nβ and (n+½)β, exact vs small-angle Δ                 | 1e-12 / 1e-3  |
+| `src/simulations/physics/double-slit/*.test.ts`       | runtime readings vs closed forms; live variables; extremes           | 1e-10 – 1e-12 |
+| `src/domains/physics/mechanics/collision1d.test.ts`   | conservation laws, textbook cases, closed-form contact end state     | 1e-12 – 1e-15 |
+| `src/simulations/physics/collision-1d/*.test.ts`      | momentum at every sample incl. contact; outcomes; no-collision cases | 1e-12         |
 
 ## Regression
 
