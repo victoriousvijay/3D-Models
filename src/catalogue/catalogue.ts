@@ -13,7 +13,7 @@ export const EXPERIENCE_LABELS: Record<ModelKind, string> = {
 export function labsInDivision(catalogue: readonly LabEntry[], division: DivisionId): LabEntry[] {
   return catalogue.filter((lab) => lab.division === division)
 }
-
+/**returns the value of constant */
 export function findLab(catalogue: readonly LabEntry[], division: string, id: string): LabEntry | undefined {
   return catalogue.find((lab) => lab.division === division && lab.id === id)
 }

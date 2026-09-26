@@ -12,7 +12,7 @@ through the same contracts, and no domain may impose its assumptions on another.
 ```text
 Platform
 ├── Landing Experience                 /                     LandingPage (hero 3D, portal transition)
-├── Science Lab Hub                    /lab                  LabHubPage (3D facility, 4 division stations)
+├── Science Lab Hub                    /lab                  LabHubPage (division character carousel)
 ├── Division Labs                      /lab/:division        DivisionPage (labs by chapter)
 │   ├── Physics   (16)  → physics domain engine
 │   ├── Chemistry (30)  → chemistry domain engine
@@ -131,7 +131,8 @@ src/
   catalogue/           divisions + 73 lab entries, validation (framework-free)
   components/
     landing/           HeroScene (3D constellation), EnterLabButton
-    hub/               HubScene (3D facility), DivisionEmblem, EmblemCanvas
+    hub/               DivisionEmblem, EmblemCanvas (division page emblems)
+    landing/           slides.ts (hub carousel characters), carousel.ts, EnterLabButton, HeroScene
     catalogue/         LabRow, LabGlyph (concept previews)
     lab/               generic instrument panels: variables, transport, measurements,
                        experiments, explanations, overlay legend; formatting; media queries

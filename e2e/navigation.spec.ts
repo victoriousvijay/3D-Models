@@ -19,10 +19,15 @@ test('Landing → Enter 3D Simulation Lab → Hub → Physics → Projectile Mot
   await expect(page).toHaveURL(/\/lab$/)
   await expect(page.getByRole('heading', { name: 'Science Simulation Lab' })).toBeVisible()
 
-  // Choosing a division flies the camera to its station, then opens the division lab.
+  // The hub is a carousel, one division per slide; Physics is in front first.
   const divisions = page.getByRole('navigation', { name: 'Divisions' })
   await expect(divisions.getByRole('button')).toHaveCount(4)
-  await divisions.getByRole('button', { name: /Physics/ }).click()
+  await page.getByRole('button', { name: 'Next division' }).click()
+  await expect(page.getByRole('link', { name: /Explore Chemistry/ })).toBeVisible()
+  // Clicks are ignored while a slide animates (650 ms).
+  await page.waitForTimeout(700)
+  await page.getByRole('button', { name: 'Previous division' }).click()
+  await page.getByRole('link', { name: /Explore Physics/ }).click()
   await expect(page).toHaveURL(/\/lab\/physics$/)
   await expect(page.getByRole('heading', { name: 'Physics Lab' })).toBeVisible()
   await expect(page.getByRole('article')).toHaveCount(16)
@@ -45,10 +50,9 @@ test('reduced motion: no transitions, navigation is immediate', async ({ page })
   await page.goto('/')
   await page.getByRole('button', { name: /Enter 3D Simulation Lab/i }).click()
   await expect(page).toHaveURL(/\/lab$/, { timeout: 1_000 })
-  await page
-    .getByRole('navigation', { name: 'Divisions' })
-    .getByRole('button', { name: /Chemistry/ })
-    .click()
+  // The switcher jumps straight to a division; the carousel moves without animation.
+  await page.getByRole('navigation', { name: 'Divisions' }).getByRole('button', { name: 'Chemistry' }).click()
+  await page.getByRole('link', { name: /Explore Chemistry/ }).click()
   await expect(page).toHaveURL(/\/lab\/chemistry$/, { timeout: 1_000 })
   await expect(page.getByRole('article')).toHaveCount(30)
 })

@@ -21,13 +21,14 @@ The product should feel like entering a scientific facility. It should not feel 
 
 ### Science Lab Hub (`/lab`)
 
-- A circular facility floor. Each division has a station: a white pedestal, a light ring and a light pool in its accent colour, and a floating 3D emblem.
-  - **Physics:** an atom with orbiting electrons.
-  - **Chemistry:** a tetrahedral molecule.
-  - **Botany:** a sprout.
-  - **Zoology:** a cell with nucleus and mitochondria.
-- Hover or focus lifts and brightens a station. Choosing one flies the camera to it.
-- **Layouts:** an arc of four on wide screens, and a 2×2 block with a steeper camera on portrait screens (the list sits below the scene).
+A character carousel, one division per slide (Physics, Chemistry, Botany, Zoology):
+
+- The division's name stands huge behind its character (Anton display type), on a full-screen colour for that division, with a light film grain.
+- The other three characters wait small and blurred: left, right and at the back.
+- The ← → buttons, the keyboard arrows or the division switcher (top right) rotate the slides. Background, word, positions, scale, blur and opacity all crossfade over 650 ms, and clicks are ignored while a slide moves.
+- **Bottom left:** "Physics Lab", the division's tagline and lab counts. **Bottom right:** "Explore Physics →" opens the division.
+- Characters are configured in `src/components/landing/slides.ts`. The current images are **placeholders** hot-linked from a third-party demo; replace them with the platform's own character art before a public launch. The rotation logic is in `carousel.ts`, and it is unit-tested.
+- Reduced motion: no crossfade; slides change instantly.
 
 ### Division Lab (`/lab/:division`)
 
